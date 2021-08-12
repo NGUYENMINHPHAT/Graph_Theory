@@ -1,0 +1,94 @@
+#include<stdio.h>
+#define MAX 100
+#define INFINITY 999999
+#define NO_EDGE 0
+int w[MAX];
+typedef struct{
+ int A[MAX][MAX];
+ int n,m;
+}Graph;
+void init_graph(Graph *G, int n){
+ int i,j;
+ G->n=n;
+ for(i=1;i<=G->n;i++)
+ for(j=1;j<=G->n;j++)
+ G->A[i][j] = 0;
+}
+void add_edge(Graph *G, int u,int v , int w){
+ G->A[u][v] = w;
+ G->A[v][u] = w;
+}
+///
+int mark[MAX];
+int pi[MAX];
+int p[MAX];
+void Dijkstra(Graph *G, int s){
+ int u,v,it;
+ for(u=1;u<=G->n;u++){
+ mark[u] = 0;
+ pi[u] = INFINITY;
+ }
+ pi[s] = w[s];
+ p[s] = -1;
+ for(it=1;it<= G->n;it++){
+ // 1. Tim j co mark[j] == 0 va co pi[j] la nho nhat va gan u = j;
+ int j , min_pi = INFINITY;
+ for(j=1;j<=G->n;j++)
+ if(mark[j] == 0 && pi[j] < min_pi){
+ min_pi = pi[j];
+ u = j;
+ }
+ // Danh dau mark[u] da xet
+ mark[u] = 1;
+ // Cap nhat lai pi va p cua cac dinh ke cua u ( neu thoa)
+ for(v=1;v<=G->n;v++)
+ if(G->A[u][v] != NO_EDGE && mark[v] == 0){
+ if(pi[u] + G->A[u][v] < pi[v]){
+ pi[v] = pi[u] + G->A[u][v];
+ p[v] = u;
+ }
+ }
+ }
+}
+int main(){
+ Graph G;
+ int m,n,u,v,i,j;
+ int k,i_ke,j_ke;
+ //freopen("mecungso3.txt","r",stdin);
+ scanf("%d %d",&m,&n); // Nhap M : so hang , N : so cot
+ init_graph(&G,n*m);
+
+ for(i=0;i<m;i++)
+ for(j=0;j<n;j++){
+ scanf("%d ",&u); // gan gia tri cua i , j cho u
+ w[i*n+j+1]=u; // u chuyen qua w[u]
+ }
+ //
+// for(i=0;i < m;i++){
+// for(j=0;j<n;j++){
+// printf("%d ",w[i*n+j+1]);
+// }
+// printf("\n");
+// }
+//
+for(i=0;i<m;i++)
+for(j=0;j<n;j++)
+{
+int di[] = {-1,1,0,0};
+int dj[] = {0,0,-1,1};
+// Duyet qua cac o ke cua o (i,j)
+for(k=0;k<4;k++){
+i_ke = i+di[k];
+j_ke = j + dj[k];
+// Kt o (i_ke,j_ke) co nam trong me cung ko?
+if((i_ke >=0) && (i_ke < m) && (j_ke >=0) && (j_ke < n)){
+v = i_ke * n + j_ke +1;
+u = i * n + j +1;
+G.A[u][v] = w[v];
+}
+}
+}
+Dijkstra(&G,1);
+printf("%d ",pi[G.n]);
+return 0;
+}

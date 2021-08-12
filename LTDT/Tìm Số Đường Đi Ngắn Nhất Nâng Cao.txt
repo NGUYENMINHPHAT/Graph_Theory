@@ -1,0 +1,171 @@
+#include <stdio.h>
+struct vertice{
+	int dist;
+	int pre;
+	int mark;
+	int cnt;
+};
+typedef struct{
+	int n;
+	int L[200][200];
+	struct vertice A[200];
+}Graph;
+
+void init_graph(Graph *G, int n){
+	int i, j;
+	G->n = n;
+	for(i = 1; i <= n; i++){
+		for(j = 1; j <= n; j++){
+			G->L[i][j] = 0;
+		}
+	}
+	
+
+}
+
+void connect_top(Graph *G, int x, int y, int w){
+	G->L[x][y] = w;
+}
+
+void show(Graph G){
+	int i, j;
+	for(i = 1; i <= G.n; i++){
+		for(j = 1; j <= G.n; j++){
+			printf("%d  ",G.L[i][j]);
+		}
+		printf("\n");
+	}
+}
+//tra ve chi so cua dinh co dist nho nhat
+int min_dist(Graph *G){
+	int i, min, index;
+	for(i = 1; i <= G->n; i++){
+		if(G->A[i].mark == 0){
+			min = G->A[i].dist;
+			index = i;
+			break;
+		}
+	}
+	
+	for(i = 1; i <= G->n; i++){
+		if(G->A[i].mark == 0){
+			if(G->A[i].dist < min) {
+				min = G->A[i].dist;
+				index = i;
+			}
+		}
+	}
+	return index;
+}
+
+void Dijkstra(Graph *G, int root){
+	int i, u, v, temp ;
+	
+	for(i = 1; i <= G->n; i++){
+		G->A[i].dist = 555;
+		G->A[i].pre = 0;
+		G->A[i].mark = 0;
+	}
+	
+	G->A[root].dist = 0;
+	G->A[root].pre = -1;
+	
+	for(i = 1; i <= G->n; i++){
+			u = min_dist(G); //lay ra dinh u co dist nho nhat
+			G->A[u].mark = 1; //khoa dinh u nay lai
+			for(v = 1; v <= G->n; v++){
+				// tim dinh v ke u va chua danh dau
+				if(G->L[u][v] != 0 && G->A[v].mark == 0){
+					temp = G->A[u].dist + G->L[u][v];
+				//cap nhat lai dist va pre cua v
+					if(temp == G->A[v].dist){
+						G->A[v].cnt += G->A[u].cnt;
+					}
+					if(temp < G->A[v].dist){
+						G->A[v].cnt = G->A[u].cnt;
+						G->A[v].dist = temp;
+						G->A[v].pre = u;
+					}
+				}
+			}
+	}
+}
+
+int lenght(Graph *G, int x, int y){
+	int len = 0, temp;
+ 	if(G->A[y].pre == 0) {
+ 		return -1;
+ 	}
+	do{
+		temp = G->A[y].pre; //temp la dinh truoc cua y
+		len = len + G->L[temp][y];
+		y = temp; //cap nhat lai y
+	}while(y != x);
+    return len;
+}
+
+#define white 0
+#define black 1
+#define gray 2
+int color[200] = {white}; int cycle = 0;
+int s[200], top = 0, key;
+void dfs(Graph *G, int x){
+	color[x] = gray;
+	int j;
+	for(j = 1; j <= G->n; j++){
+		if(G->L[x][j] != 0){
+			if(color[j] == gray){
+				cycle = 1;
+				key = j;
+//				return;
+			}
+			if(color[j] == white){
+				dfs(G,j);
+			}
+		}
+	}
+	if(cycle){
+		top++;
+		s[top] = x;
+	}
+	color[x] = black;
+}
+
+void is_cycle(Graph *G){
+	dfs(G,1);
+	if(cycle) printf("co\n");
+	else printf("khong co\n");
+	while(key != s[top]){
+		top--;
+	}
+	while(top > 0){
+		printf("%d\t",s[top]);
+		top--;
+	}
+}
+
+int main(){
+//	freopen("d:\\LYTHUYETDOTHI\\filetest.txt", "r", stdin); //Nop bài nho bo dòng này.
+	Graph G;
+	int n, m, u, v, e, w;
+	scanf("%d %d", &n, &m); //Doc du lieu n dinh m cung
+	init_graph(&G, n);
+	for (e = 1; e <= m; e++) {
+		scanf("%d%d%d", &u, &v, &w);
+		connect_top(&G, u, v, w);
+	}
+	for (e = 1; e <= n; e++) {
+		G.A[e].cnt = 1;
+		G.A[e].mark = 0;
+	}
+//	printf("%d",n);
+    Dijkstra(&G,1);
+    if(lenght(&G,1,n) == -1) printf("-1 0");
+    else	printf("%d %d",lenght(&G,1,n),G.A[n].cnt);
+
+//    printf("%d",lenght(&G,1,n));
+//	is_negative_cycle(&G);
+//	show(G);
+//	is_cycle(&G);
+	return 0;
+}

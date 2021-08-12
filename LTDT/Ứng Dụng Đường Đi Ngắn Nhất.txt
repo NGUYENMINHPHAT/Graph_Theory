@@ -1,0 +1,86 @@
+//Ung dung tim duong di ngan nhat
+#include <stdio.h>
+#define MAX 100
+#define NO_EDGE 9999999
+#define INFINITY 999999
+int mark[MAX];
+int pi[MAX];
+int p[MAX];
+typedef struct{
+int n;
+int A[MAX][MAX];
+}Graph;
+void init_graph(Graph* G,int n){
+int i,j;
+G->n=n;
+for(i=1;i<=n;i++)
+for(j=1;j<=n;j++)
+G->A[i][j]=NO_EDGE;
+}
+void add_edge(Graph* G,int x,int y,int w){
+G->A[x][y]=w;
+G->A[y][x]=w;
+}
+int degree(Graph* G,int x){
+ int y,deg=0;
+ for(y=1;y<=G->n;y++)
+ if(G->A[x][y]>0)
+ deg+=G->A[x][y];
+ return deg;
+}
+int adjacent(Graph* G,int x,int y){
+ if(G->A[x][y]!=0)
+ return 1;
+ else
+ return 0;
+}
+void Dijkstra(Graph *G,int s)
+{
+int i,j,it;
+for(i=1;i<=G->n;i++)
+{
+pi[i]=INFINITY;
+mark[i]=0;
+}
+pi[s]=0;
+p[s]=-1;
+for(it=1;it<G->n;it++)
+{
+int min_pi =INFINITY;
+for(j=1;j<=G->n;j++)
+{
+if(mark[j]==0&&pi[j]<min_pi)
+{
+min_pi= pi[j];
+i=j;
+}
+ }
+mark[i]=1;
+for(j=1;j<=G->n;j++)
+{
+if(G->A[i][j] != NO_EDGE && mark[j]==0)
+{
+if(pi[i]+G->A[i][j]<pi[j])
+{
+pi[j]=pi[i]+G->A[i][j];
+p[j]=i;
+}
+}
+}
+}
+}
+int main(){
+// freopen("ungdung.txt", "r", stdin);
+Graph G;
+int n, m, u, v, w, e,s,t;
+scanf("%d%d", &n, &m);
+init_graph(&G, n);
+for (e = 0; e < m; e++) {
+scanf("%d%d%d", &u, &v, &w);
+add_edge(&G, u, v , w);
+}
+scanf("%d%d", &s, &t);
+Dijkstra(&G, s);
+printf("%d", pi[t]);
+return 0;
+}

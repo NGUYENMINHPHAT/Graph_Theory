@@ -1,0 +1,73 @@
+#include <stdio.h>
+#define MAX 100
+// Do Thi G ma tran Ke
+typedef struct {
+ int x,y,z;
+}Edge;
+typedef struct {
+int n,m;
+Edge Data[MAX];
+}dothi;
+void khoitao(dothi *G,int n){
+G->n = n;
+G->m = 0;
+}
+void themcung(dothi *G,int x,int y, int W){
+G->Data[G->m].x = x;
+G->Data[G->m].y = y;
+G->Data[G->m].z = W;
+G->m++;
+}
+int parent[100];
+int findRoot (int u){
+if (parent[u] == u)
+return u;
+return findRoot(parent[u]);
+}
+int Kruskal (dothi *G, dothi *T){
+int i,j,e,u;
+Edge temp;
+for (i=0;i< G->m;i++)
+for(j=i+1;j< G->m; j++){
+if(G->Data[i].z > G->Data[j].z){
+temp = G->Data[i];
+G->Data[i] = G->Data[j];
+G->Data[j] = temp;
+}
+}
+khoitao(T,G->n);
+for (u=1;u <= G->n; u++)
+parent[u] = u;
+int sum_w = 0;
+for(e=0;e < G->m ; e++){
+int u = G->Data[e].x;
+int v = G->Data[e].y;
+int w = G->Data[e].z;
+int root_u = findRoot(u);
+int root_v = findRoot(v);
+if(root_u != root_v){
+if (u<v)
+themcung(T,u,v,w);
+else themcung(T,v,u,w);
+parent[root_v] = root_u;
+sum_w += w;
+}
+}
+return sum_w;
+}
+int main(){
+//freopen("dt.txt", "r", stdin); //Khi n?p bài nh? b? dòng này.
+dothi G,T;
+int n, m, u, v, w, e;
+scanf("%d%d", &n, &m);
+khoitao(&G, n);
+//khoitao(&T, n);
+for (e = 0; e < m; e++) {
+scanf("%d%d%d", &u, &v, &w);
+themcung(&G, u, v, w);
+}
+int sum_w = Kruskal(&G,&T);
+printf("%d \n",sum_w);
+for (e=0;e <T.m ; e++)
+printf("%d %d %d \n",T.Data[e].x,T.Data[e].y,T.Data[e].z);
+}

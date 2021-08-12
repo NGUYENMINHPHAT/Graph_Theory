@@ -1,0 +1,43 @@
+#include <stdio.h>
+#define MAX_ELEMENTS 100
+#define MAX_VERTEXES 100
+//============================ List
+typedef struct{
+    int A[100][100];
+    int n;
+}Graph;
+int mark[MAX_VERTEXES]={0},ok=0;
+//================================ dfs
+void dfs(Graph G, int u){
+	if (ok) return ;
+	mark[u]=1;
+	int v;
+	for (v=1;v<=G.n;v++)
+		if (G.A[u][v]){
+			if (mark[v]){
+				ok = 1;
+				return;
+			}
+			if (!mark[v]){
+				dfs(G,v);	
+			}
+		}
+}
+void depth_first_search(Graph* G){
+	dfs(*G,1);
+	if (ok)	printf("NO");
+	else printf("YES");
+}
+int main(){
+//	freopen("dothi_dfs.txt","r",stdin);
+    Graph G;
+	int n, m, u, v, e;
+	scanf("%d%d", &n,&m);
+	G.n=n;
+	for (e=0;e<m;e++){
+	    scanf("%d %d",&u,&v);
+	    G.A[u][v]=1;
+	}
+    depth_first_search(&G);
+    return 0;
+ }

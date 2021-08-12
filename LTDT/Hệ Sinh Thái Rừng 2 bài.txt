@@ -1,0 +1,107 @@
+include
+define MAX_VERTICES 100
+define MAX_EDGES 500
+/cai dat khai bao/
+typedef struct{
+int n,m;
+int A[MAX_VERTICES][MAX_EDGES];
+}Graph;
+//khoi tao do thi
+void init_graph(Graph *G, int n, int m){
+int i,j;
+G->n=n;
+G->m=m;
+for ( i=1; i<=n; i++){ for ( j=1; j<=m; j++) G->A[i][j]=0;
+}
+}
+//them dinh vao do thi
+void add_edge(Graph *G, int e, int x, int y){
+G->A[x][e]=1;
+G->A[y][e]=1;
+}
+//kiem tra x co ke y hay khong
+int adjacent(Graph* G, int x, int y){
+int e;
+for ( e=1; e<= G->m; e++)
+if ( G->A[x][e]==1 && G->A[y][e]==1 )
+return 1;
+return 0;
+}
+//tinh va tra ve bac cua dinh x
+int degree(Graph* G, int x){
+int e, deg=0;
+for ( e=1; e<= G->m; e++)
+if( G->A[x][e]==1)
+deg++;
+return deg;
+}
+//in ra man hinh cac dinh ke cua x, moi dinh cach nhau 1 khoang trang
+void neighbours(Graph *G, int x, int y){
+int e;
+for (e=1; e<=G->n; e++){
+if(x!=e){
+if (adjacent(G,x,e)==1 && adjacent(G,y,e)==1){
+printf("%d ",e);
+}
+} }
+}
+int main(){
+Graph G;
+int flag=0;
+int n, m, u, v, e, x, y;
+scanf("%d%d", &n, &m);
+init_graph(&G, n,m);
+for ( e=1; e<=m; e++){
+scanf("%d%d",&u,&v);
+add_edge(&G,e,u,v);
+}
+for(e=1;e<=n;e++){
+scanf("%d%d", &x, &y);
+if(adjacent(&G,x,e)!=0 && adjacent(&G,y,e)!=0 ){
+flag++;
+}
+}
+if(flag!=0){
+neighbours(&G,x,y);
+}
+else{
+printf("KHONG CHUNG DOI THU");
+}
+}
+
+===================================================
+
+include
+define MAX_N 100
+typedef struct{
+int n,m;
+int A[MAX_N][MAX_N];
+}Graph;
+void init_graph(GraphG,int n){ int i,j; G->n=n; for(i=1;i<=n;i++){ for(j=1;j<=n;j++){ G->A[i][j]=0; } } } void add_edge(GraphG,int x,int y){
+G->A[x][y]=1;
+G->A[y][x]=1;
+}
+int adjacient(Graph*G,int x,int y){
+return G->A[x][y]!=0;
+}
+int main(){
+Graph G;
+int n,i,j,e,x,y;
+int count=0;
+scanf("%d",&n);
+init_graph(&G,n);
+for(i=1;i<=n;i++){
+for(j=1;j<=n;j++){
+scanf("%d",&e);
+if(e==1)
+add_edge(&G,i,j);
+}
+}
+scanf("%d%d",&x,&y);
+for(i=1;i<=n;i++){
+if((adjacient(&G,x,i)==1)&&(adjacient(&G,y,i)==1)){
+count++;
+}
+}
+printf("%d",count);
+}
