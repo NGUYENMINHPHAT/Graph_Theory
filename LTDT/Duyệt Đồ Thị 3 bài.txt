@@ -118,8 +118,7 @@ breath_first_search(&G, i);
 return 0; 
 } 
 
-============================================
-
+======
 #include <stdio.h>
 #define MAX_ELEMENTS 100
 #define MAX_VERTICES 100
