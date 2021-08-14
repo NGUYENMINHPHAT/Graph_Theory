@@ -1,297 +1,398 @@
-#include<stdio.h> 
-#define MAX_Vertices 20 
-#define MAX_Length 20 
-#define MAX_Element 40 
-typedef struct{ 
-    int A[MAX_Vertices][MAX_Vertices]; 
-int n; 
-}Graph; 
-void init_Graph(Graph *G, int n){ 
-G->n=n; 
-int i, j; 
-for(i=1; i<=G->n; i++) 
-for(j=1; j<=G->n; j++) 
-G->A[i][j] = 0; 
-} 
-void print_Graph(Graph G){ 
-int i, j; 
-for(i=1; i<=G.n; i++){ 
-for(j=1; j<=G.n; j++) 
-printf("%d ", G.A[i][j]); 
-printf("\n"); 
-    }  
-    printf("\n"); 
-} 
-void add_edge(Graph *G, int x, int y){ 
-G->A[x][y] =1; 
-G->A[y][x] =1; 
-} 
-int adjacent(Graph *G, int x, int y){ 
-return(G->A[x][y] !=0 ); 
-} 
-int degree(Graph *G, int x){ 
+#include <stdio.h>
+#define MAX_Vertices 20
+#define MAX_Element 40
+#define MAX_Length 20
+typedef struct {
+int A[MAX_Vertices][MAX_Vertices];
+int n;
+} Graph;
+void init_Graph (Graph *G, int n) {
+int i, j;
+G->n = n;
+for (i = 1; i <= n; i++)
+for (j = 1; j <= n; j++)
+G->A[i][j] = 0;
+}
+void add_edge (Graph *G, int x, int y) {
+G->A[x][y] = 1;
+G->A[y][x] = 1;
+}
+// kiem tra co ke
+int adjacent (Graph *G, int x, int y) {
+return G->A[x][y] != 0;
+}
+int deg(Graph* G, int x){ 
 int i, deg=0; 
-for(i=1; i<=G->n; i++){ 
-if(adjacent(G, i, x)) deg++; 
-} 
+for (i=1;i<=G->n;i++) 
+if (adjacent(G,i,x))
+deg++; 
 return deg; 
 } 
-typedef struct{ 
-int data[MAX_Length]; 
-int size; 
-}List; 
-void make_null(List *list){ 
-list->size=0; 
-} 
-void push_back(List *list, int x){ 
-list->data[list->size] =x; 
-list->size++; 
-} 
-int element_at(List *list, int i){ 
-return list->data[i-1]; 
-} 
-List neighbors(Graph *G, int x){ 
-List L; 
-make_null(&L); 
-int i; 
-for(i=1; i<=G->n; i++) 
-if(adjacent(G, i, x)) push_back(&L, i);	 
-return L; 
-} 
-typedef struct { 
-int data[MAX_Element]; 
-int front, rear; 
-}Queue; 
-void make_null_queue(Queue *Q){ 
+
+typedef struct {
+int data [MAX_Element];
+int size;
+}List;
+
+void make_null(List * list) {
+list->size = 0;
+}
+
+void push_back(List *list, int x) {
+list->data[list->size] = x;
+list->size++;
+}
+int element_at(List * list, int i) {
+return list->data[i-1];
+}
+
+List neighbors (Graph * G, int x) {
+int i;
+List L;
+make_null(&L);
+for (i = 1; i <= G->n; i++)
+if (G->A[i][x]==1){
+push_back(&L, i);
+}
+return L;
+}
+typedef struct {
+int data [MAX_Element];
+int front;
+int rear;
+}Queue;
+
+void make_null_Queue(Queue *Q){ 
 Q->front =0; 
 Q->rear =-1; 
 } 
-int empty(Queue *Q){ 
-return Q->front > Q->rear; 
-} 
-void push(Queue *Q, int x){ 
+void push_Queue(Queue *Q, int x){ 
 Q->rear++; 
 Q->data[Q->rear] =x; 
 } 
+int empty_Queue(Queue *Q){ 
+return Q->front > Q->rear; 
+} 
+
 int top(Queue *Q){ 
 return Q->data[Q->front]; 
 } 
 void pop(Queue *Q){ 
 Q->front++; 
 } 
-int mark[MAX_Vertices]; 
-void breath_first_search(Graph *G, int k){ 
-Queue frontier; 
-make_null_queue(&frontier); 
-int i;  
-push(&frontier, k); 
-mark[k] =1; 
-while(!empty(&frontier)){ 
-int x = top(&frontier); 
-pop(&frontier); 
-printf("%d %d\n", x,k); 
-List list = neighbors(G, x); 
-for(i=1; i<=list.size; i++){ 
-int y = element_at(&list, i); 
-if(mark[y] ==0){ 
-mark[y] =1; 
-push(&frontier, y); 
-} 
-} 
+
+List breath_first_search(Graph *G, int x,int parent[]){
+    Queue Q;
+    make_null_Queue(&Q);
+    int mark[MAX_Vertices];
+    int i;
+    for(i=1;i<=G->n;i++){
+        mark[i]=0;
+        push_Queue(&Q,x);
+    }
+        parent[x]=0;
+        List L_bfs;
+        make_null(&L_bfs);
+    
+        while(!empty_Queue(&Q)){ 
+            int u=top(&Q);
+            pop(&Q);
+            if(mark[u]==1)
+            continue;
+            push_back(&L_bfs,u);
+            mark[u]=1;
+            List L;
+            make_null(&L);
+            L=neighbors(G,u);
+          int v;
+            for(i=1; i<=L.size; i++){ 
+            v= element_at(&L, i); 
+                if(mark[v] ==0){
+                 push_Queue(&Q,v);
+                 if(parent[v]==-1)
+                 parent[v]=u;
+                }
+            }
+    }
+   return L_bfs; 
 }
+int main(){
+    Graph G;
+    int n,m;
+    scanf("%d%d", &n, &m); 
+    init_Graph(&G, n); 
+int e, x, y; 
+for(e=1; e<=m; e++){ 
+scanf("%d%d", &x, &y); 
+add_edge(&G, x, y); 
 } 
-int main(){ 
-Graph G;	 
-int n, m; 
-//	freopen("DFS_Recursion.txt", "r", stdin); 
-scanf("%d%d", &n, &m); 
-init_Graph(&G, n); 
-int u, v, i; 
-for(i=1; i<=m; i++){ 
-scanf("%d%d", &u, &v); 
-add_edge(&G, u, v); 
-} 
-for(i=1; i<=G.n; i++) mark[i] =0; 
-for(i=1; i<=n; i++) 
-if(mark[i] ==0) 
-breath_first_search(&G, i);							 
-return 0; 
-} 
+int mark_bfs[MAX_Vertices], parent[MAX_Vertices],u;
+ for(u=1; u<=G.n; u++){ 
+  mark_bfs[u]=0;
+  parent[u]=-1;
+ }
+
+for(u=1; u<=G.n; u++){ 
+    if(mark_bfs[u]==0){
+        List L= breath_first_search(&G,u,parent);
+        int i,v;
+        for(i=1; i<=L.size; i++){ 
+         v= element_at(&L, i); 
+            //printf("%d\n",v);
+              mark_bfs[v]=1;
+    }
+    }
+}
+for(u=1; u<=G.n; u++){
+    printf("%d %d\n",u,parent[u]);
+}
+    return 0;
+}
+
 
 ==============================================
 
 #include <stdio.h>
-#define MAX_ELEMENTS 100
-#define MAX_VERTICES 100
-typedef int Element_Type;
+#define MAX_Vertices 20
+#define MAX_Element 40
+#define MAX_Length 20
 typedef struct {
-Element_Type data[MAX_ELEMENTS];
+int A[MAX_Vertices][MAX_Vertices];
+int n;
+} Graph;
+void init_Graph (Graph *G, int n) {
+int i, j;
+G->n = n;
+for (i = 1; i <= n; i++)
+for (j = 1; j <= n; j++)
+G->A[i][j] = 0;
+}
+void add_edge (Graph *G, int x, int y) {
+G->A[x][y] = 1;
+G->A[y][x] = 1;
+}
+// kiem tra co ke
+int adjacent (Graph *G, int x, int y) {
+return G->A[x][y] != 0;
+}
+int deg(Graph* G, int x){ 
+int i, deg=0; 
+for (i=1;i<=G->n;i++) 
+if (adjacent(G,i,x))
+deg++; 
+return deg; 
+} 
+
+typedef int ElementType;
+typedef struct {
+ElementType data [MAX_Element];
 int size;
 }List;
-void make_null_list(List *L){
-L->size=0;
+// tao rong
+void make_null(List * L) {
+L->size = 0;
 }
-void push_back(List *L, Element_Type x){
-L->data[L->size]=x;
+// them phan tu
+void push_back(List *L, ElementType x) {
+L->data[L->size] = x;
 L->size++;
 }
-Element_Type element_at(List *L, int i){
+// lay phan tu tai vi tri i, phan tu dat o bat ky dau
+ElementType element_at(List * L, int i) {
 return L->data[i-1];
 }
-int count_list(List *L){
+// tra ve so phan tu danh sach
+int count_list(List *L) {
 return L->size;
 }
-typedef struct {
-int n;
-List adj[MAX_VERTICES];
-}Graph;
-void init_graph(Graph *G, int n){
-G->n=n;
-int i;
-for(i=1; i<=n; i++)
-make_null_list(&G->adj[i]);
-}
-void add_edge(Graph *G, int x, int y){
-push_back(&G->adj[x], y);
-push_back(&G->adj[y], x);
-}
-int adjacent(Graph *G, int x, int y){
-int i;
-for(i=1; i<=G->adj[x].size; i++)
-if(element_at(&G->adj[x],i) == y)
-return 1;
-return 0;
-}
-int degree(Graph *G, int x){
-return G->adj[x].size;
-}
-List neighbors(Graph *G, int x){
-List L;
-make_null_list(&L);
+// tim cac dinh ke
+List neighbors (Graph * G, int x) {
 int y;
-for(y=1 ;y<=G->n; y++)
-if(adjacent(G,x,y) ) push_back(&L, y);
-return L;
+List list;
+make_null(&list);
+for (y = 1; y <= G->n; y++)
+if (adjacent(G, x, y))
+push_back(&list, y);
+return list;
 }
-int mark[MAX_VERTICES];
-void traversal(Graph *G, int x){
-if(mark[x] == 1) return;
-mark[x]=1;
-printf("%d\n",x);
-List L=neighbors(G,x);
-int i;
-for(i=1; i<=L.size; i++){
-int y=element_at(&L,i);
-traversal(G,y);
+
+typedef struct {
+int data[MAX_Element];
+int size;
+} Stack;
+void make_null_stack(Stack *stack) {
+ stack->size = 0;
 }
+void push_stack(Stack* stack, int x) {
+ stack->data[stack->size] = x;
+ stack->size++;
 }
-void depth_first_search(Graph *G, int x){
-int i;
-for(i=1; i<=G->n; i++)
-//mark[i]=0;
-traversal(G,x);
+int top(Stack* stack) {
+return  stack->data[stack->size - 1];
 }
+void pop(Stack*  stack) {
+ stack->size--;
+}
+int empty(Stack* stack) {
+return stack->size == 0;
+}
+List depth_first_search(Graph* G, int x,int parent[]) {
+    Stack S;
+    make_null_stack(&S);
+    push_stack(&S,x);
+    parent[x]=0;
+    List list_dfs;
+    make_null(&list_dfs);
+    int mark[MAX_Vertices];
+    int i;
+    for (i = 1; i <= G->n; i++)
+        mark[i] = 0;
+    while (!empty(&S)) {
+        int u=top(&S);
+        pop(&S);
+        if(mark[u]==1)
+        continue;
+        push_back(&list_dfs,u);
+        mark[u]=1;
+        List list =neighbors(G,u);
+        for (i= 1; i <= list.size; i++) {
+int v = element_at(&list, i);
+if(mark[v]==0){
+    push_stack(&S,v);
+    parent[v]=u;
+}
+    }
+}
+return list_dfs;
+}
+
 int main(){
-// freopen("dt.txt", "r", stdin);
-Graph G;
-int n, m, u, v, w, e;
-scanf("%d%d", &n, &m);
-init_graph(&G, n);
-for (e = 0; e < m; e++) {
+    Graph G;
+    int n,m,i,j;
+   scanf("%d%d", &n, &m);
+   init_Graph(&G, n);
+   int e,u,v;
+   for (e = 0; e <=m; e++) {
 scanf("%d%d", &u, &v);
 add_edge(&G, u, v);
+   }
+   
+   int parent[MAX_Vertices];
+   for(i=1;i<=G.n;i++){
+       parent[i]=-1;
+   }
+   int mark_dfs[MAX_Vertices];
+   for(i=1;i<=G.n;i++){
+    mark_dfs[i]=0;   
+   }
+     for(i=1;i<=G.n;i++){
+         if(mark_dfs[i]==0){
+             List dfs=depth_first_search(&G,i,parent);
+              for(j=1;j<=dfs.size;j++){
+                  int k= element_at(&dfs,j);
+                  mark_dfs[k]=1;
+         }
+         }
+     }
+      for(u=1;u<=G.n;u++)
+          printf("%d %d\n",u,parent[u]);
+    return 0;
 }
-depth_first_search(&G, 1);
-for (w = 1; w <= n; w++)
-if (mark[w] == 0)
-depth_first_search(&G,w);
-}
+
 
 ============================================
 
 #include <stdio.h>
-#define MAX_ELEMENTS 100
-#define MAX_VERTICES 100
-typedef int Element_Type;
+#define MAX_Vertices 20
+#define MAX_Length 20
 typedef struct {
-Element_Type data[MAX_ELEMENTS];
+int A[MAX_Vertices][MAX_Vertices];
+int n;
+} Graph;
+void init_Graph (Graph *G, int n) {
+int i, j;
+G->n = n;
+for (i = 1; i <= n; i++)
+for (j = 1; j <= n; j++)
+G->A[i][j] = 0;
+}
+void add_edge (Graph *G, int x, int y) {
+G->A[x][y] = 1;
+G->A[y][x] = 1;
+}
+// kiem tra co ke
+int adjacent (Graph *G, int x, int y) {
+return G->A[x][y] != 0;
+}
+int deg(Graph* G, int x){ 
+int i, deg=0; 
+for (i=1;i<=G->n;i++) 
+if (adjacent(G,i,x))
+deg++; 
+return deg; 
+} 
+typedef struct {
+int data [MAX_Length];
 int size;
 }List;
-void make_null_list(List *L){
-L->size=0;
+// tao rong
+void make_null(List * list) {
+list->size = 0;
 }
-void push_back(List *L, Element_Type x){
-L->data[L->size]=x;
-L->size++;
+// them phan tu
+void push_back(List *list, int x) {
+list->data[list->size] = x;
+list->size++;
 }
-Element_Type element_at(List *L, int i){
-return L->data[i-1];
+// lay phan tu tai vi tri i, phan tu dat o bat ky dau
+int element_at(List * list, int i) {
+return list->data[i-1];
 }
-int count_list(List *L){
-return L->size;
-}
-typedef struct {
-int n;
-List adj[MAX_VERTICES];
-}Graph;
-void init_graph(Graph *G, int n){
-G->n=n;
-int i;
-for(i=1; i<=n; i++)
-make_null_list(&G->adj[i]);
-}
-void add_edge(Graph *G, int x, int y){
-push_back(&G->adj[x], y);
-push_back(&G->adj[y], x);
-}
-int adjacent(Graph *G, int x, int y){
-int i;
-for(i=1; i<=G->adj[x].size; i++)
-if(element_at(&G->adj[x],i) == y)
-return 1;
-return 0;
-}
-int degree(Graph *G, int x){
-return G->adj[x].size;
-}
-List neighbors(Graph *G, int x){
+// tim cac dinh ke
+List neighbors (Graph * G, int x) {
 List L;
-make_null_list(&L);
-int y;
-for(y=1 ;y<=G->n; y++)
-if(adjacent(G,x,y) ) push_back(&L, y);
+make_null(&L);
+int i;
+for (i = 1; i <= G->n; i++)
+if (G->A[i][x]==1){
+push_back(&L, i);
+}
 return L;
 }
-int mark[MAX_VERTICES];
-void traversal(Graph *G, int x){
-if(mark[x] == 1) return;
-mark[x]=1;
-printf("%d\n",x);
-List L=neighbors(G,x);
-int i;
-for(i=1; i<=L.size; i++){
-int y=element_at(&L,i);
-traversal(G,y);
-}
-}
-void depth_first_search(Graph *G, int x){
-int i;
-for(i=1; i<=G->n; i++)
-//mark[i]=0;
-traversal(G,x);
+int mark[MAX_Vertices];
+int parent[MAX_Vertices];
+void DFS(Graph *G,int u,int p){
+    if(mark[u]==1)
+        return;
+           parent[u]=p;
+        mark[u]=1;
+    List list=neighbors(G,u);
+    int i;
+    for(i=1;i<=list.size;i++){
+        int v=element_at(&list,i);
+        DFS(G,v,u);
+    }
 }
 int main(){
-// freopen("dt.txt", "r", stdin);
-Graph G;
-int n, m, u, v, w, e;
-scanf("%d%d", &n, &m);
-init_graph(&G, n);
-for (e = 0; e < m; e++) {
+    Graph G;
+    int m,n;
+   scanf("%d%d", &n, &m);
+init_Graph(&G, n);
+int u,v,i;
+for (i = 1; i <=m; i++) {
 scanf("%d%d", &u, &v);
 add_edge(&G, u, v);
+} 
+    for (i = 1; i <=n; i++){ 
+    mark[i]=0;
+    parent[i]=-1;
+    }
+    for (i = 1; i <=n; i++)
+    if(mark[i]==0)
+    DFS(&G,i,0);
+    for (i = 1; i <=n; i++) 
+     printf("%d %d\n",i,parent[i]);  
+    return 0;
 }
-depth_first_search(&G, 1);
-for (w = 1; w <= n; w++)
-if (mark[w] == 0)
-depth_first_search(&G,w);
-}
+
+NMP
